@@ -7,11 +7,20 @@ import plotly.graph_objs as go
 import plotly.figure_factory as ff
 from dash.dependencies import Input,Output,State
 import pandas as pd
-imdb=pd.read_csv('imdb.csv',index_col=0)
-films = imdb[imdb['type'] == "Film"].sort_values('weighted_rating', ascending=False)
-TV_Films = imdb[imdb['type'] == "TV Films"].sort_values('weighted_rating', ascending=False)
-TV_Series = imdb[imdb['type'] == "TV Series"].sort_values('weighted_rating', ascending=False)
-Video= imdb[imdb['type'] == "Video"].sort_values('weighted_rating', ascending=False)
+import ast
+imdb=pd.read_csv('imdb1.csv',index_col=0)
+imdb['actors'] = imdb['actors'].fillna('[]')
+imdb['directors'] = imdb['directors'].fillna('[]')
+convert_to_list = lambda x: ast.literal_eval(x)
+converted = lambda x: x[0].split(',') if len(x)!=0 else ['Unknown']
+imdb['actors'] = imdb['actors'].apply(convert_to_list)
+imdb['actors'] = imdb['actors'].apply(converted)
+imdb['directors'] = imdb['directors'].apply(convert_to_list)
+imdb['directors'] = imdb['directors'].apply(converted)
+# films = imdb[imdb['type'] == "Film"].sort_values('weighted_rating', ascending=False)
+# TV_Films = imdb[imdb['type'] == "TV Films"].sort_values('weighted_rating', ascending=False)
+# TV_Series = imdb[imdb['type'] == "TV Series"].sort_values('weighted_rating', ascending=False)
+# Video= imdb[imdb['type'] == "Video"].sort_values('weighted_rating', ascending=False)
 
 
 def world_map():
@@ -165,4 +174,101 @@ def groth():
     fig.update_xaxes(tickmode='linear', tick0=1900, dtick=10)
     fig.update_yaxes(title_text='Density of Titles', tickformat=',.2%', exponentformat='none', showexponent='none')
     return fig
+
+def pop_act_dirct(col="actors"):
+    if col == "directors":
+        Yt='Dirctor'
+        slicer=0
+    else:
+        Yt="Actor"
+        slicer=1
+        
+    imdb_actors = imdb.explode(col)
+
+    # count the number of movies for each actor
+    actor_counts = imdb_actors[col].value_counts().reset_index()
+   
+
+    # rename the columns
+    actor_counts.columns = [Yt, 'Movie Count']
+
+    # filter the top 15 actors by movie count
+    top_15_actors = actor_counts[slicer:].head(15)
+
+    # create a horizontal bar chart using Plotly Express
+    fig = px.bar(top_15_actors.sort_values('Movie Count', ascending=False), x='Movie Count', y=Yt,
+                orientation='h', color=Yt, text='Movie Count')
+
+    # update the layout
+    fig.update_layout(
+        xaxis_title=f"Count of {Yt}'s Content",
+        yaxis_title=Yt,
+        yaxis=dict(
+            tickmode='linear',
+            tick0=0,
+            dtick=1,
+            categoryorder='max ascending'
+            
+        ),
+        plot_bgcolor='#f8f8f8',
+        font_family='Arial',
+        font_size=12,
+        title_font_size=18,
+        legend_font_size=14,
+        margin=dict(l=80, r=20, t=80, b=20)
+    )
+
+    return fig
+
+def top_active(col="actors",chois=0):
+    # calculate the average rating for each actor and genre
+    imdb_actors = imdb.explode(col)
+    imdb_actors= imdb_actors[imdb_actors[col]!='Unknown']
+    actor_ratings = imdb_actors.groupby([col, 'type']).agg({'weighted_rating': 'mean'}).reset_index()
+
+    # get the top 10 actors in each genre
+    top_actors = {}
+    for content_type in imdb['type'].unique():
+        imdb_content = imdb[imdb['type'] == content_type]
+        actor_counts = imdb_content.explode(col)[col].value_counts().reset_index().rename(columns={'index': col, col: 'count'})
+        actor_counts=actor_counts[actor_counts[col]!='Unknown']
+        top_actors_list = actor_counts.head(10)[col].tolist()
+        top_actors[content_type] = top_actors_list
+
+    # create a grouped bar chart
+    lst=[]
+
+    # add a trace for each content type and actor
+    for content_type in imdb['type'].unique():
+        actors = top_actors[content_type]
+        actor_ratings_content = actor_ratings[(actor_ratings['type'] == content_type) & (actor_ratings[col].isin(actors))]
+        actor_ratings_content = actor_ratings_content.sort_values(by='weighted_rating', ascending=False)
+
+        x = actor_ratings_content[col].tolist()
+        y = actor_ratings_content['weighted_rating'].tolist()
+        
+        lst.append((x,y,content_type))
+
+    fig = go.Figure(
+        go.Bar(
+        x=lst[chois][0],
+        y=lst[chois][1],
+        name=lst[chois][2],
+    ))
+
+    
+
+    # update the layout
+    fig.update_layout(
+        title=f'Top 10 {col} by {lst[chois][2]} on  Rating',
+        font_family='Arial',
+        font_size=12,
+        title_font_size=18,
+        xaxis_title=col,
+        yaxis_title='Rating',
+        barmode='group',
+        margin=dict(l=100, r=20, t=80, b=20)
+    )
+    return fig
+
 
