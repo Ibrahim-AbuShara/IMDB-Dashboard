@@ -33,18 +33,8 @@ def world_map():
                 hover_name='country',
                 title='Content per Country',
                 color_continuous_scale='emrld'
+                
             )
-    
-def dur_content ():
-    return px.scatter(
-        imdb,
-        x='duration',
-        y='weighted_rating',
-        hover_data=['title','numVotes','averageRating'],
-        color='type',
-        color_continuous_scale="Viridis"
-        )
-
 def compare_avg_rating ():
         f=imdb.copy()
         f['averageRating']=f['averageRating'].round()
@@ -75,7 +65,7 @@ def compare_avg_rating ():
             
         )
 
-        fig2.update_traces(textposition='top center', textfont=dict(size=9), marker=dict(sizemin=7))
+        fig2.update_traces(textposition='top center', textfont=dict(size=14), marker=dict(sizemin=7))
         fig2.update_layout(
             xaxis_title='Average Rating',
             annotations=[
@@ -87,34 +77,10 @@ def compare_avg_rating ():
                     font=dict(size=8),
                     showarrow=False
                 ) for index, row in low_high.iterrows()
-            ]
+            ],
+            height=625
         )
         return fig2
-
-def dur_type():
-    # Create a hierarchical index of movies by genre and MPAA rating
-    movies_by_genre_rating = imdb.groupby(['type', 'duration'])['tconst'].count().reset_index()
-
-    # Create a sunburst chart of movies by genre and MPAA rating
-    fig = px.sunburst(movies_by_genre_rating, path=['type', 'duration'], values='tconst',
-                    title='Distribution of Content Durations by Type')
-
-    hovertemplate = 'Duration: %{label} min<br>Nof.%{parent}: %{value}<br>'
-
-    fig.update_traces(hovertemplate=hovertemplate)
-    fig.update_layout(margin=dict(l=50, r=50, b=100, t=100),
-                  showlegend=False, annotations=[dict(text='', x=0.5, y=0.5, font_size=20, showarrow=False)])
-
-# Set domain of pie chart
-    fig.update_layout(
-        annotations=[dict(text='', x=0.5, y=0.5, font_size=20, showarrow=False)],
-       
-        showlegend=False,
-        margin=dict(l=40, r=10, t=40, b=40),
-        template="plotly_white",
-
-)
-    return fig
 
 def rating_genre():
     genre_highest_ratings = imdb.groupby('genre')['weighted_rating'].mean().reset_index().sort_values("weighted_rating",ascending=False)
@@ -136,7 +102,7 @@ def rating_genre():
             dtick=1,
             categoryorder='max ascending',
         ),
-        width=850, 
+        width=750, 
         height=625,
         plot_bgcolor='#f8f8f8',
         font_family='Arial',
@@ -148,31 +114,6 @@ def rating_genre():
     )
 
     
-    return fig
-
-
-def groth():
-    moves_per_year = imdb.groupby('year')['title'].count().reset_index()
-    group_labels = ['Year']
-    fig = ff.create_distplot([imdb["year"].values.tolist()], group_labels,
-                            colors =  ['#FFCC33'], bin_size=1)
-
-    # update the layout and axis labels
-    fig.update_layout(title='Trend of IMDb Data Growth',
-                    xaxis_title='Year',
-                    yaxis_title='Density',
-                    title_font_size=20,
-                    font_family='Arial',
-                    font_size=14,
-                    plot_bgcolor='#f8f8f8',
-                    margin=dict(l=80, r=20, t=80, b=20),
-                    width=640,
-                    height=500,
-                    ),
-                    
-
-    fig.update_xaxes(tickmode='linear', tick0=1900, dtick=10)
-    fig.update_yaxes(title_text='Density of Titles', tickformat=',.2%', exponentformat='none', showexponent='none')
     return fig
 
 def pop_act_dirct(col="actors"):
@@ -270,5 +211,101 @@ def top_active(col="actors",chois=0):
         margin=dict(l=100, r=20, t=80, b=20)
     )
     return fig
+    
+def dur_content ():
+    return px.scatter(
+        imdb,
+        x='duration',
+        y='weighted_rating',
+        hover_data=['title','numVotes','averageRating'],
+        color='type',
+        color_continuous_scale="Viridis"
+        )
+
+
+
+def dur_type():
+    # Create a hierarchical index of movies by genre and MPAA rating
+    movies_by_genre_rating = imdb.groupby(['type', 'duration'])['tconst'].count().reset_index()
+
+    # Create a sunburst chart of movies by genre and MPAA rating
+    fig = px.sunburst(movies_by_genre_rating, path=['type', 'duration'], values='tconst',
+                    title='Distribution of Content Durations by Type')
+
+    hovertemplate = 'Duration: %{label} min<br>Nof.%{parent}: %{value}<br>'
+
+    fig.update_traces(hovertemplate=hovertemplate)
+    fig.update_layout(margin=dict(l=50, r=50, b=100, t=100),
+                  showlegend=False, annotations=[dict(text='', x=0.5, y=0.5, font_size=20, showarrow=False)])
+
+# Set domain of pie chart
+    fig.update_layout(
+        annotations=[dict(text='', x=0.5, y=0.5, font_size=20, showarrow=False)],
+       
+        showlegend=False,
+        margin=dict(l=40, r=10, t=40, b=40),
+        template="plotly_white",
+
+)
+    return fig
+
+
+def rating_over_years(typ=3):
+  # Group the data by year and calculate the average weighted rating for each year
+    average_rating = imdb.groupby(['year', 'type'])['weighted_rating'].mean().reset_index()
+
+    # Create separate lines for each type of movie with non-empty data
+    lines = []
+    colors = ['#FFCC33',"#ff704d",'#ff8533','#66d9ff',]  # Custom colors for each line
+    for movie_type in imdb['type'].unique():
+        data = average_rating[average_rating['type'] == movie_type]
+        
+        if not data.empty:
+            line = go.Scatter(x=data['year'], y=data['weighted_rating'], mode='lines', name=movie_type,
+                               line=dict(color=colors[typ])) 
+            lines.append(line)
+
+    # Create the layout for the line chart
+    name=imdb['type'].unique()[typ]
+    layout = go.Layout(
+        title=f'Average Rating of {name} Over the Years',
+        xaxis=dict(title='Year'),
+        yaxis=dict(title='Average Rating'),
+        legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+        
+    )
+
+    # Create the figure with the lines and layout
+    figure = go.Figure(data=lines[typ], layout=layout)
+
+    # Show the line chart
+    return figure
+
+
+def groth():
+    moves_per_year = imdb.groupby('year')['title'].count().reset_index()
+    group_labels = ['Year']
+    fig = ff.create_distplot([imdb["year"].values.tolist()], group_labels,
+                            colors =  ['#FFCC33'], bin_size=1)
+
+    # update the layout and axis labels
+    fig.update_layout(title='Trend of IMDb Data Growth',
+                    xaxis_title='Year',
+                    yaxis_title='Density',
+                    title_font_size=20,
+                    font_family='Arial',
+                    font_size=14,
+                    plot_bgcolor='#f8f8f8',
+                    margin=dict(l=80, r=20, t=80, b=20),
+                    # width=640,
+                    # height=500,
+                    ),
+                    
+
+    fig.update_xaxes(tickmode='linear', tick0=1900, dtick=10)
+    fig.update_yaxes(title_text='Density of Titles', tickformat=',.2%', exponentformat='none', showexponent='none')
+    return fig
+
+
 
 

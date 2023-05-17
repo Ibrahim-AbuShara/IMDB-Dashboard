@@ -55,6 +55,24 @@ navbar = dbc.Navbar(
     sticky='top'
 )
 
+map_var = dbc.Col(
+    dcc.Graph(
+        figure=world_map().update_layout(
+            geo=dict(
+                bgcolor='rgba(0,0,0,0.01)',  # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(0,0,0,0.07)'
+            ),
+            plot_bgcolor='rgba(0,0,0,0.01)',  # set plot background color to black
+            paper_bgcolor='rgba(0,0,0,0.7)',  # set paper background color to black
+            font_color='white'  # set font color to white
+        ),
+        style={'width': '90%', 'height': '85vh', 'margin': 'auto'}  # center the graph and set width and height
+    ),
+    width={'size': 10, 'offset': 1, 'order': 'first'}  # adjust width and offset to center the column
+)
+
 # Movie Popularity Graph
 rating_genre_var = dbc.Col(
     dcc.Graph(
@@ -70,13 +88,13 @@ rating_genre_var = dbc.Col(
             font_color='white' # set font color to white
         )
     ),
-    width=6
+    width=5
 )
 
 # Movie Budgets Graph
-groth_var =  dbc.Col(
+comp_var =  dbc.Col(
     dcc.Graph(
-        figure=groth().update_layout(
+        figure=compare_avg_rating().update_layout(
             geo=dict(
                 bgcolor='rgba(0,0,0,0.01)', # set background color to black
                 showland=True,
@@ -90,8 +108,8 @@ groth_var =  dbc.Col(
             
         )
     ),
-      width={"size": 5, "order": "last","offset": 1 },
-      style={"margin-left": "100px"}
+      width=6
+     
       
 )
 con_type_items = [
@@ -188,6 +206,80 @@ pop_act_dirct_var = dbc.Col(
     width=6
 )
 
+dur_content_var = dbc.Col(
+           [       
+            dcc.Graph(
+        figure=dur_content().update_layout(
+            geo=dict(
+                bgcolor='rgba(0,0,0,0.01)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(0,0,0,0.07)'
+            ),
+            plot_bgcolor='rgba(0,0,0,0.01)', # set plot background color to black
+            paper_bgcolor='rgba(0,0,0,0.7)', # set paper background color to black
+            font_color='white', # set font color to white
+        )
+    )],
+    width=6,
+    )
+
+
+dur_type_var = dbc.Col(
+           [       
+            dcc.Graph(
+        figure=dur_type().update_layout(
+            geo=dict(
+                bgcolor='rgba(0,0,0,0.01)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(0,0,0,0.07)'
+            ),
+            plot_bgcolor='rgba(0,0,0,0.01)', # set plot background color to black
+            paper_bgcolor='rgba(0,0,0,0.7)', # set paper background color to black
+            font_color='white', # set font color to white
+        )
+    )],
+    width=6,
+    )
+
+
+rating_over_years_var = dbc.Col(
+           [       
+            dcc.Graph(
+        figure=rating_over_years().update_layout(
+            geo=dict(
+                bgcolor='rgba(0,0,0,0.01)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(0,0,0,0.07)'
+            ),
+            plot_bgcolor='rgba(0,0,0,0.01)', # set plot background color to black
+            paper_bgcolor='rgba(0,0,0,0.7)', # set paper background color to black
+            font_color='white', # set font color to white
+        )
+    )],
+    width=6,
+    )
+
+groth_var = dbc.Col(
+           [       
+            dcc.Graph(
+        figure=groth().update_layout(
+            geo=dict(
+                bgcolor='rgba(0,0,0,0.01)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(0,0,0,0.07)'
+            ),
+            plot_bgcolor='rgba(0,0,0,0.01)', # set plot background color to black
+            paper_bgcolor='rgba(0,0,0,0.7)', # set paper background color to black
+            font_color='white', # set font color to white
+        )
+    )],
+    width=6,
+    )
+
 
 
 
@@ -201,8 +293,15 @@ app.layout = html.Div(
                 html.Br(),
                 dbc.Row(
                     [
-                        rating_genre_var,  
-                        groth_var,     
+                        map_var
+                    ]
+                
+                ),
+                html.Br(),
+                dbc.Row(
+                    [
+                        comp_var,     
+                         rating_genre_var
                     ]
                 
                 ),
@@ -210,6 +309,17 @@ app.layout = html.Div(
                 dbc.Row([
                         pop_act_dirct_var,
                         top_active_var
+                        ]),
+                
+                 html.Br(),
+                dbc.Row([
+                        dur_content_var,
+                        dur_type_var
+                        ]),
+                 html.Br(),
+                dbc.Row([
+                        rating_over_years_var,
+                        groth_var
                         ])
             ],
             fluid=True,
@@ -298,6 +408,6 @@ def update_act_dect(*args):
         font_color='white'
     
     )
-    return fig,fig2
+    return fig,fig2                                 
 if __name__ == "__main__":
     app.run_server(debug=True)
