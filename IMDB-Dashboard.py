@@ -11,49 +11,52 @@ from fun import  *
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
 # Navbar
+IMDB_LOGO = "https://ia.media-imdb.com/images/M/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE@._V1_.png"
+
+search_bar = dbc.Row(
+    [
+        dbc.Col(dbc.Input(type="search", placeholder="Search")),
+        dbc.Col(
+            dbc.Button(
+                "Search", color="primary", className="ms-2", n_clicks=0
+            ),
+            width="auto",
+        ),
+    ],
+    className="g-0 ms-auto flex-nowrap mt-3 mt-md-0",
+    align="center",
+)
+
 navbar = dbc.Navbar(
     dbc.Container(
         [
             html.A(
+                # Use row and col to control vertical alignment of logo / brand
                 dbc.Row(
                     [
-                        dbc.Col(html.Img(src="https://ia.media-imdb.com/images/M/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE@._V1_.png",
-                                         height="35px")),
-                        dbc.Col(dbc.NavbarBrand("IMDb Dashboard", className="ml-auto")),
+                        dbc.Col(html.Img(src=IMDB_LOGO, height="30px")),
+                        dbc.Col(dbc.NavbarBrand("IMDb Dashboard", className="ms-2")),
                     ],
                     align="center",
-                 
+                    className="g-0",
                 ),
-               
+                href="#",
+                style={"textDecoration": "none"},
             ),
-            dbc.NavbarToggler(id="navbar-toggler"),
+            dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
             dbc.Collapse(
-                dbc.Nav(
-                    [
-                        dbc.NavItem(dbc.NavLink("Home", href="/", active="exact")),
-                        dbc.DropdownMenu(
-                            [
-                                dbc.DropdownMenuItem("Action", href="#", className="animated fadeInUp"),
-                                dbc.DropdownMenuItem("Comedy", href="#", className="animated fadeInUp"),
-                                dbc.DropdownMenuItem("Drama", href="#", className="animated fadeInUp"),
-                            ],
-                            nav=True,
-                            in_navbar=True,
-                            label="Genres",
-                        ),
-                    ],
-                    className="ml-auto",
-                    navbar=True,
-                ),
+                search_bar,
                 id="navbar-collapse",
+                is_open=False,
                 navbar=True,
             ),
         ]
     ),
     color="dark",
     dark=True,
-    sticky='top'
 )
+
+
 
 map_var = dbc.Col(
     dcc.Graph(
@@ -242,47 +245,86 @@ dur_type_var = dbc.Col(
     )],
     width=6,
     )
+type_items = [
+    dbc.DropdownMenuItem("Film",id="00"),
+    dbc.DropdownMenuItem(divider=True),
+    dbc.DropdownMenuItem("TV Films",id="11"),
+    dbc.DropdownMenuItem(divider=True),
+    dbc.DropdownMenuItem("TV Series",id="22"),
+    dbc.DropdownMenuItem(divider=True),
+    dbc.DropdownMenuItem("Video",id="33"),
+]
 
+button = dbc.DropdownMenu(
+    label="type",
+    size="sm",
+    children=type_items,
+    toggle_style={
+        "textTransform": "uppercase",
+        "background": "#000000A0",
+        "position": "sticky",
+        "bottom": "1000px",
+        "right": "5px",
+        "z-index": "10000"
+    },
+    toggleClassName="fst-italic border border-dark",
+)
 
+# Update the layout
 rating_over_years_var = dbc.Col(
-           [       
-            dcc.Graph(
-        figure=rating_over_years().update_layout(
-            geo=dict(
-                bgcolor='rgba(0,0,0,0.01)', # set background color to black
-                showland=True,
-                showocean=True,
-                oceancolor='rgba(0,0,0,0.07)'
-            ),
-            plot_bgcolor='rgba(0,0,0,0.01)', # set plot background color to black
-            paper_bgcolor='rgba(0,0,0,0.7)', # set paper background color to black
-            font_color='white', # set font color to white
-        )
-    )],
-    width=6,
-    )
+    [
+        dcc.Graph(
+             id='rating_over_years-graph',
+            figure=rating_over_years().update_layout(
+                geo=dict(
+                    bgcolor='rgba(0,0,0,0.01)',
+                    showland=True,
+                    showocean=True,
+                    oceancolor='rgba(0,0,0,0.07)'
+                ),
+                plot_bgcolor='rgba(0,0,0,0.01)',
+                paper_bgcolor='rgba(0,0,0,0.7)',
+                font_color='white',
+            )
+        ),
+        button
+    ],
+    width=6
+)
 
 groth_var = dbc.Col(
-           [       
-            dcc.Graph(
-        figure=groth().update_layout(
-            geo=dict(
-                bgcolor='rgba(0,0,0,0.01)', # set background color to black
-                showland=True,
-                showocean=True,
-                oceancolor='rgba(0,0,0,0.07)'
-            ),
-            plot_bgcolor='rgba(0,0,0,0.01)', # set plot background color to black
-            paper_bgcolor='rgba(0,0,0,0.7)', # set paper background color to black
-            font_color='white', # set font color to white
+    [
+        dcc.Graph(
+            figure=groth().update_layout(
+                geo=dict(
+                    bgcolor='rgba(0,0,0,0.01)',
+                    showland=True,
+                    showocean=True,
+                    oceancolor='rgba(0,0,0,0.07)'
+                ),
+                plot_bgcolor='rgba(0,0,0,0.01)',
+                paper_bgcolor='rgba(0,0,0,0.7)',
+                font_color='white',
+            )
         )
-    )],
-    width=6,
-    )
+    ],
+    width=6
+)
 
-
-
-
+map_header = html.H3(
+    "Header 1",
+    className="header",
+    style={
+        "border": "1px solid #000000",
+        "padding": "10px",
+        "background-color": "#000000A0",
+        "font-family": "Arial, sans-serif",
+        "color": "white",
+        "border-radius": "10px",
+        "position": "relative",
+       
+    }
+)
 
 # App layout
 app.layout = html.Div(
@@ -291,36 +333,41 @@ app.layout = html.Div(
         dbc.Container(
             [
                 html.Br(),
+                map_header,
+
                 dbc.Row(
                     [
                         map_var
                     ]
-                
                 ),
                 html.Br(),
                 dbc.Row(
                     [
                         comp_var,     
-                         rating_genre_var
+                        rating_genre_var
                     ]
-                
                 ),
-                 html.Br(),
-                dbc.Row([
+                html.Br(),
+                dbc.Row(
+                    [
                         pop_act_dirct_var,
                         top_active_var
-                        ]),
-                
-                 html.Br(),
-                dbc.Row([
+                    ]
+                ),
+                html.Br(),
+                dbc.Row(
+                    [
                         dur_content_var,
                         dur_type_var
-                        ]),
-                 html.Br(),
-                dbc.Row([
+                    ]
+                ),
+                html.Br(),
+                dbc.Row(
+                    [
                         rating_over_years_var,
                         groth_var
-                        ])
+                    ]
+                )
             ],
             fluid=True,
             style={
@@ -331,7 +378,7 @@ app.layout = html.Div(
                 "background-position": "center center",
                 "background-attachment": "fixed",
                 "position": "relative",
-               "backdrop-filter": "blur(5px)",
+                "backdrop-filter": "blur(5px)",
             }
         ),
     ],
@@ -344,7 +391,6 @@ app.layout = html.Div(
         "backdrop-filter": "blur(1px)",
     }
 )
-
 
 
 @app.callback(
@@ -408,6 +454,43 @@ def update_act_dect(*args):
         font_color='white'
     
     )
-    return fig,fig2                                 
+    return fig,fig2          
+    
+@app.callback(
+    Output('rating_over_years-graph', 'figure'),
+    
+    [
+     Input("00", "n_clicks"),
+     Input("11", "n_clicks"),
+     Input("22", "n_clicks"),
+     Input("33", "n_clicks"),
+     ]
+)
+def update_roy(*args):
+    # Define the logic to update the graph based on the selected option
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        typ=0
+    else:
+        selected_option = ctx.triggered[0]["prop_id"].split(".")[0][0]
+        print(selected_option)
+        typ=int(selected_option)
+   
+    
+    data = rating_over_years(typ)
+    fig = data.update_layout(
+        geo=dict(
+            bgcolor='rgba(0,0,0,0.01)',
+            showland=True,
+            showocean=True,
+            oceancolor='rgba(0,0,0,0.07)'
+        ),
+        plot_bgcolor='rgba(0,0,0,0.01)',
+        paper_bgcolor='rgba(0,0,0,0.7)',
+        font_color='white'
+    
+    )
+    
+    return fig                               
 if __name__ == "__main__":
     app.run_server(debug=True)

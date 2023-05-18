@@ -250,7 +250,7 @@ def dur_type():
     return fig
 
 
-def rating_over_years(typ=3):
+def rating_over_years(typ=0):
   # Group the data by year and calculate the average weighted rating for each year
     average_rating = imdb.groupby(['year', 'type'])['weighted_rating'].mean().reset_index()
 
