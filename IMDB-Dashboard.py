@@ -7,6 +7,9 @@ import plotly.graph_objs as go
 import plotly.figure_factory as ff
 from dash.dependencies import Input,Output,State
 import pandas as pd
+from PyMovieDb import IMDB
+import webbrowser
+import json
 from fun import  *
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
 
@@ -15,10 +18,10 @@ IMDB_LOGO = "https://ia.media-imdb.com/images/M/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFt
 
 search_bar = dbc.Row(
     [
-        dbc.Col(dbc.Input(type="search", placeholder="Search")),
+        dbc.Col(dbc.Input(id="search-input", type="search", placeholder="Search")),
         dbc.Col(
             dbc.Button(
-                "Search", color="primary", className="ms-2", n_clicks=0
+                "Search", id="search-button", color="primary", className="ms-2", n_clicks=0
             ),
             width="auto",
         ),
@@ -28,9 +31,11 @@ search_bar = dbc.Row(
 )
 
 navbar = dbc.Navbar(
+    
     dbc.Container(
         [
             html.A(
+                
                 # Use row and col to control vertical alignment of logo / brand
                 dbc.Row(
                     [
@@ -449,6 +454,7 @@ time_header = html.H3(
 app.layout = html.Div(
     [
         navbar,
+        html.Div(id="output-div"),
         dbc.Container(
             [
                 html.Br(),
@@ -689,7 +695,36 @@ def update_fig2(*args):
     )
     return fig  
 
+@app.callback(
+    Output("navbar-collapse", "is_open"),
+    [Input("navbar-toggler", "n_clicks")],
+    [State("navbar-collapse", "is_open")],
+)
+def toggle_navbar_collapse(n, is_open):
+    if n:
+        return not is_open
+    return is_open
+
+# callback to redirect user to IMDB with the input value
+@app.callback(
+    Output("output-div", "children"),
+    [Input("search-button", "n_clicks")],
+    [State("search-input", "value")],
+)
+def redirect_to_IMDB(n_clicks, input_value):
+    imdb = IMDB()
+    if n_clicks > 0 and input_value:
+        string = imdb.search(input_value)
+        if string=='{\n  "result_count": 0,\n  "results": []\n}':
+            url='https://www.imdb.com/title/tt029046rr502/?ref_=fn_al_tt_1'
+        else:
+            res=json.loads(string)
+            url=res["results"][0]['url']
+        webbrowser.open(url, new=2)
+    return ""
 
                           
 if __name__ == "__main__":
     app.run_server(debug=True)
+    
+    

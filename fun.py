@@ -34,8 +34,7 @@ def world_map():
                 hover_name='country',
                 title='Content per Country',
                 color_continuous_scale='emrld'
-                
-            )
+            ).update_layout(title_font_size=24,)
 def compare_avg_rating (col="averageRating"):
         f=imdb.copy()
         f[col]=f[col].round()
