@@ -71,14 +71,41 @@ map_var = dbc.Col(
             paper_bgcolor='rgba(0,0,0,0.7)',  # set paper background color to black
             font_color='white'  # set font color to white
         ),
-        style={'width': '90%', 'height': '85vh', 'margin': 'auto'}  # center the graph and set width and height
+        style={'width': '90%', 'height': '80vh', 'margin': 'auto'}  # center the graph and set width and height
     ),
     width={'size': 10, 'offset': 1, 'order': 'first'}  # adjust width and offset to center the column
 )
 
-# Movie Popularity Graph
+
+rating_genre_items = [
+    dbc.DropdownMenuItem("Rating per Genre",id="rating"),
+    dbc.DropdownMenuItem(divider=True),
+    dbc.DropdownMenuItem("Top 10 Movies",id="top"),
+]
+rating = dbc.DropdownMenu(
+    label="SELECT",
+    size="sm",
+    children=rating_genre_items,
+    toggle_style={
+        
+        "background": "#000000A0",
+    },
+    toggleClassName="fst-italic border border-dark",
+)
+
 rating_genre_var = dbc.Col(
+    [       
+              dbc.Row(
+            dbc.Col(
+                rating,
+                width={"size": 50},
+                style={"backgroundColor": "transparent"}
+             ),
+            justify="start",
+            style={"margin-up": "100px"}
+        ),
     dcc.Graph(
+        id="rating-graph",
         figure=rating_genre().update_layout(
             geo=dict(
                 bgcolor='rgba(0,0,0,0.01)', # set background color to black
@@ -91,12 +118,39 @@ rating_genre_var = dbc.Col(
             font_color='white' # set font color to white
         )
     ),
-    width=5
+    ],width=5
 )
 
-# Movie Budgets Graph
+comp_items = [
+    dbc.DropdownMenuItem("Average Rating",id="averageRating"),
+    dbc.DropdownMenuItem(divider=True),
+    dbc.DropdownMenuItem("Weighted Rating",id="weighted_rating"),
+]
+comp = dbc.DropdownMenu(
+    label="Rating",
+    size="sm",
+    children=comp_items,
+    toggle_style={
+        
+        "background": "#000000A0",
+    },
+    toggleClassName="fst-italic border border-dark",
+)
+
+
 comp_var =  dbc.Col(
+      [       
+              dbc.Row(
+            dbc.Col(
+                comp,
+                width={"size": 50},
+                style={"backgroundColor": "transparent"}
+             ),
+            justify="start",
+            style={"margin-up": "100px"}
+        ),
     dcc.Graph(
+        id='comp-graph',
         figure=compare_avg_rating().update_layout(
             geo=dict(
                 bgcolor='rgba(0,0,0,0.01)', # set background color to black
@@ -111,6 +165,7 @@ comp_var =  dbc.Col(
             
         )
     ),
+      ],
       width=6
      
       
@@ -312,17 +367,81 @@ groth_var = dbc.Col(
 )
 
 map_header = html.H3(
-    "Header 1",
+    "Exploring the Worldwide Distribution of Content:- ",
     className="header",
     style={
-        "border": "1px solid #000000",
+        "border": "2px solid #ffffff00",
         "padding": "10px",
-        "background-color": "#000000A0",
+        "background-color": "#4C4C4C50",
         "font-family": "Arial, sans-serif",
-        "color": "white",
+        "color": "#eefbf3",
         "border-radius": "10px",
         "position": "relative",
-       
+        "font-style": "italic",
+        "box-shadow": "0px 2px 10px rgba(10, 10, 10, 0.9)"
+    }
+)
+Rating_header = html.H3(
+    "Content Ratings Analysis :- ",
+    className="header",
+    style={
+        "border": "2px solid #ffffff00",
+        "padding": "10px",
+        "background-color": "#4C4C4C50",
+        "font-family": "Arial, sans-serif",
+        "color": "#eefbf3",
+        "border-radius": "10px",
+        "position": "relative",
+        "font-style": "italic",
+        "box-shadow": "0px 2px 10px rgba(10, 10, 10, 0.9)"
+    }
+)
+
+poularty_header = html.H3(
+    "Do active Actors/Directors tend to have higher ratings? ",
+    className="header",
+    style={
+        "border": "2px solid #ffffff00",
+        "padding": "10px",
+        "background-color": "#4C4C4C50",
+        "font-family": "Arial, sans-serif",
+        "color": "#eefbf3",
+        "border-radius": "10px",
+        "position": "relative",
+        "font-style": "italic",
+        "box-shadow": "0px 2px 10px rgba(10, 10, 10, 0.9)"
+    }
+)
+
+duration_header = html.H3(
+    "Content Duration Analysis :- ",
+    className="header",
+    style={
+        "border": "2px solid #ffffff00",
+        "padding": "10px",
+        "background-color": "#4C4C4C50",
+        "font-family": "Arial, sans-serif",
+        "color": "#eefbf3",
+        "border-radius": "10px",
+        "position": "relative",
+        "font-style": "italic",
+        "box-shadow": "0px 2px 10px rgba(10, 10, 10, 0.9)"
+    }
+)
+
+time_header = html.H3(
+    "Content Time Analysis :- ",
+    className="header",
+    style={
+        "border": "2px solid #ffffff00",
+        "padding": "10px",
+        "background-color": "#4C4C4C50",
+        "font-family": "Arial, sans-serif",
+        "color": "#eefbf3",
+        "border-radius": "10px",
+        "position": "relative",
+        "font-style": "italic",
+        "box-shadow": "0px 2px 10px rgba(10, 10, 10, 0.9)"
     }
 )
 
@@ -334,12 +453,18 @@ app.layout = html.Div(
             [
                 html.Br(),
                 map_header,
+                html.Br(),
+                
 
                 dbc.Row(
                     [
                         map_var
                     ]
                 ),
+                html.Br(),
+                html.Br(),
+                
+                Rating_header,
                 html.Br(),
                 dbc.Row(
                     [
@@ -348,6 +473,9 @@ app.layout = html.Div(
                     ]
                 ),
                 html.Br(),
+                html.Br(),
+                poularty_header,
+                html.Br(),
                 dbc.Row(
                     [
                         pop_act_dirct_var,
@@ -355,12 +483,18 @@ app.layout = html.Div(
                     ]
                 ),
                 html.Br(),
+                html.Br(),
+                duration_header,
+                html.Br(),
                 dbc.Row(
                     [
                         dur_content_var,
                         dur_type_var
                     ]
                 ),
+                html.Br(),
+                html.Br(),
+                time_header,
                 html.Br(),
                 dbc.Row(
                     [
@@ -490,7 +624,72 @@ def update_roy(*args):
         font_color='white'
     
     )
+    return fig     
+
+@app.callback(
+    Output('comp-graph', 'figure'),
     
-    return fig                               
+    [
+     Input("averageRating", "n_clicks"),
+     Input("weighted_rating", "n_clicks"),
+     ]
+)
+def update_fig1(*args):
+    # Define the logic to update the graph based on the selected option
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        selected_option="averageRating"
+    
+    else:
+       selected_option=ctx.triggered[0]["prop_id"].split(".")[0]
+    data = compare_avg_rating(selected_option)
+    fig = data.update_layout(
+        geo=dict(
+            bgcolor='rgba(0,0,0,0.01)',
+            showland=True,
+            showocean=True,
+            oceancolor='rgba(0,0,0,0.07)'
+        ),
+        plot_bgcolor='rgba(0,0,0,0.01)',
+        paper_bgcolor='rgba(0,0,0,0.7)',
+        font_color='white'
+    
+    )
+    return fig  
+
+@app.callback(
+    Output('rating-graph', 'figure'),
+    
+    [
+     Input("rating", "n_clicks"),
+     Input("top", "n_clicks"),
+     ]
+)
+def update_fig2(*args):
+    # Define the logic to update the graph based on the selected option
+    ctx = dash.callback_context
+    if not ctx.triggered:
+        selected_option="rating"
+    
+    else:
+       selected_option=ctx.triggered[0]["prop_id"].split(".")[0]
+       
+    data = rating_genre(selected_option)
+    fig = data.update_layout(
+        geo=dict(
+            bgcolor='rgba(0,0,0,0.01)',
+            showland=True,
+            showocean=True,
+            oceancolor='rgba(0,0,0,0.07)'
+        ),
+        plot_bgcolor='rgba(0,0,0,0.01)',
+        paper_bgcolor='rgba(0,0,0,0.7)',
+        font_color='white'
+    
+    )
+    return fig  
+
+
+                          
 if __name__ == "__main__":
     app.run_server(debug=True)

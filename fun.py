@@ -1,13 +1,13 @@
-import dash
 from dash import dcc, html
 import dash_bootstrap_components as dbc
-import plotly
 import plotly.express as px
 import plotly.graph_objs as go
 import plotly.figure_factory as ff
 from dash.dependencies import Input,Output,State
 import pandas as pd
 import ast
+
+
 imdb=pd.read_csv('imdb1.csv',index_col=0)
 imdb['actors'] = imdb['actors'].fillna('[]')
 imdb['directors'] = imdb['directors'].fillna('[]')
@@ -17,10 +17,11 @@ imdb['actors'] = imdb['actors'].apply(convert_to_list)
 imdb['actors'] = imdb['actors'].apply(converted)
 imdb['directors'] = imdb['directors'].apply(convert_to_list)
 imdb['directors'] = imdb['directors'].apply(converted)
-# films = imdb[imdb['type'] == "Film"].sort_values('weighted_rating', ascending=False)
+films = imdb[imdb['type'] == "Film"].sort_values('weighted_rating', ascending=False)
 # TV_Films = imdb[imdb['type'] == "TV Films"].sort_values('weighted_rating', ascending=False)
 # TV_Series = imdb[imdb['type'] == "TV Series"].sort_values('weighted_rating', ascending=False)
 # Video= imdb[imdb['type'] == "Video"].sort_values('weighted_rating', ascending=False)
+
 
 
 def world_map():
@@ -35,42 +36,47 @@ def world_map():
                 color_continuous_scale='emrld'
                 
             )
-def compare_avg_rating ():
+def compare_avg_rating (col="averageRating"):
         f=imdb.copy()
-        f['averageRating']=f['averageRating'].round()
-        movies = f.sort_values('averageRating', ascending=False)
-        high_votes = movies.groupby('averageRating').max()
-        low_votes = movies.groupby('averageRating').min()
-        movies['min_numVotes']=movies.groupby('averageRating')['numVotes'].transform('min')
+        f[col]=f[col].round()
+        movies = f.sort_values(col, ascending=False)
+        high_votes = movies.groupby(col).max(numeric_only=True)
+        low_votes = movies.groupby(col).min(numeric_only=True)
+        movies['min_numVotes']=movies.groupby(col)['numVotes'].transform('min')
         min_votes = movies[movies['numVotes'] == movies['min_numVotes']]
-        low_votes=min_votes.drop_duplicates('averageRating').drop(columns=['min_numVotes'])
-        movies['max_numVotes']=movies.groupby('averageRating')['numVotes'].transform('max')
+        low_votes=min_votes.drop_duplicates(col).drop(columns=['min_numVotes'])
+        movies['max_numVotes']=movies.groupby(col)['numVotes'].transform('max')
         max_votes = movies[movies['numVotes'] == movies['max_numVotes']]
-        high_votes=max_votes.drop_duplicates('averageRating').drop(columns=['max_numVotes'])
+        high_votes=max_votes.drop_duplicates(col).drop(columns=['max_numVotes'])
         high_votes.reset_index(inplace=True)
         low_votes.reset_index(inplace=True)
         low_high=pd.concat([low_votes,high_votes],ignore_index=True)
         low_high.drop_duplicates('tconst',inplace=True)
-        low_high=low_high[low_high['averageRating']!=10.0]
-        low_high.sort_values(['averageRating','numVotes'],inplace=True,ascending=True)
+        low_high=low_high[low_high[col]!=10.0]
+        low_high.sort_values([col,'numVotes'],inplace=True,ascending=True)
         fig2 = px.scatter(
             low_high,
-            x='averageRating',
+            x=col,
             y='numVotes',
-            hover_data=['title', 'numVotes', 'averageRating','type'],
-            color='averageRating',
+            hover_data=['title', 'numVotes', col,'type'],
+            color=col,
             size='numVotes',
             size_max=60,
-            color_continuous_scale="ylorrd"
+            color_continuous_scale="ylorrd",
+            title=f'{col} vs Number of Votes'
+            
             
         )
 
         fig2.update_traces(textposition='top center', textfont=dict(size=14), marker=dict(sizemin=7))
         fig2.update_layout(
             xaxis_title='Average Rating',
+            font_size=14,
+            font_family='Arial',
+            title_font_size=18,
             annotations=[
                 dict(
-                    x=row['averageRating'],
+                    x=row[col],
                     y=row['numVotes'],
                     text=row['title'],
                     textangle=20,
@@ -78,20 +84,31 @@ def compare_avg_rating ():
                     showarrow=False
                 ) for index, row in low_high.iterrows()
             ],
-            height=625
+            height=600
         )
         return fig2
 
-def rating_genre():
-    genre_highest_ratings = imdb.groupby('genre')['weighted_rating'].mean().reset_index().sort_values("weighted_rating",ascending=False)
+def rating_genre(col="Rating per Genre"):
+    top=films.sort_values("weighted_rating",ascending =False).head(10)
+    if col !="top":
+        genre_highest_ratings = imdb.groupby('genre')['weighted_rating'].mean().reset_index().sort_values("weighted_rating",ascending=False)
 
-    fig = px.bar(genre_highest_ratings, x='weighted_rating',
-                 y='genre',
-                 orientation='h',
-                 color="weighted_rating",
-                title='Highest Rating by Genre',
-                color_continuous_scale='orrd'
-                )
+        fig = px.bar(genre_highest_ratings, x='weighted_rating',
+                    y='genre',
+                    orientation='h',
+                    color="weighted_rating",
+                    title='Highest Rating by Genre',
+                    color_continuous_scale='orrd'
+                    )
+    else:
+        fig = px.bar(top, x='title',
+                    y='weighted_rating',
+                    color="weighted_rating",
+                    title='Top 10 Movies',
+                    color_continuous_scale='orrd',
+                    hover_data=["title","averageRating","weighted_rating"]
+                    )
+        
 
     fig.update_layout(
         xaxis_title='Weighted Rating',
@@ -103,12 +120,12 @@ def rating_genre():
             categoryorder='max ascending',
         ),
         width=750, 
-        height=625,
+        height=600,
         plot_bgcolor='#f8f8f8',
         font_family='Arial',
-        font_size=16,
+        font_size=14,
         title_font_size=18,
-        legend_title='Weighted Rating',
+        legend_title='Rating',
         legend_font_size=14,
         margin=dict(l=80, r=20, t=80, b=20)
     )
@@ -118,7 +135,7 @@ def rating_genre():
 
 def pop_act_dirct(col="actors"):
     if col == "directors":
-        Yt='Dirctor'
+        Yt='Director'
         slicer=0
     else:
         Yt="Actor"
@@ -138,7 +155,7 @@ def pop_act_dirct(col="actors"):
 
     # create a horizontal bar chart using Plotly Express
     fig = px.bar(top_15_actors.sort_values('Movie Count', ascending=False), x='Movie Count', y=Yt,
-                orientation='h', color=Yt, text='Movie Count')
+                orientation='h', color=Yt, text='Movie Count',title=f"{Yt}s' Content Count")
 
     # update the layout
     fig.update_layout(
@@ -219,7 +236,13 @@ def dur_content ():
         y='weighted_rating',
         hover_data=['title','numVotes','averageRating'],
         color='type',
-        color_continuous_scale="Viridis"
+        color_continuous_scale="Viridis",
+        title="Correlation between the duration of a Content and its rating"
+        ).update_layout(
+        xaxis_title='Duration in minutes',
+        margin=dict(l=40, r=10, t=40, b=40),
+        
+            
         )
 
 
@@ -230,7 +253,7 @@ def dur_type():
 
     # Create a sunburst chart of movies by genre and MPAA rating
     fig = px.sunburst(movies_by_genre_rating, path=['type', 'duration'], values='tconst',
-                    title='Distribution of Content Durations by Type')
+                    title='\nDistribution of Content Durations by Type')
 
     hovertemplate = 'Duration: %{label} min<br>Nof.%{parent}: %{value}<br>'
 
@@ -272,6 +295,8 @@ def rating_over_years(typ=0):
         xaxis=dict(title='Year'),
         yaxis=dict(title='Average Rating'),
         legend=dict(orientation='h', yanchor='bottom', y=1.02, xanchor='right', x=1),
+        title_font_size=20,
+        font_family='Arial',
         
     )
 
@@ -296,7 +321,7 @@ def groth():
                     font_family='Arial',
                     font_size=14,
                     plot_bgcolor='#f8f8f8',
-                    margin=dict(l=80, r=20, t=80, b=20),
+                    
                     # width=640,
                     # height=500,
                     ),
