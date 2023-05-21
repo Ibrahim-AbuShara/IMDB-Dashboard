@@ -1,93 +1,96 @@
 import dash
-import dash_bootstrap_components as dbc
-from dash import Input, Output, State, html
-import webbrowser
-from PyMovieDb import IMDB
-import json
+from dash import  dcc
+import plotly.graph_objects as go
+from dash import html
 
-PLOTLY_LOGO = "https://images.plot.ly/logo/new-branding/plotly-logomark.png"
-
-search_bar = dbc.Row(
-    [
-        dbc.Col(dbc.Input(id="search-input", type="search", placeholder="Search")),
-        dbc.Col(
-            dbc.Button(
-                "Search", id="search-button", color="primary", className="ms-2", n_clicks=0
+# Create the figures for each BAN
+counter_var = go.Figure(go.Indicator(
+    mode="number",
+    value=38338,
+    number={'valueformat': ',', 'font': {'size': 60}},
+    title={"text": "Total IMDB Content"}
+)).update_layout(
+            geo=dict(
+                bgcolor='rgba(76, 76, 76, 0.3137)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(76, 76, 76, 0.3137)'
             ),
-            width="auto",
-        ),
+            plot_bgcolor='rgba(76, 76, 76, 0.3137)', # set plot background color to black
+            paper_bgcolor='rgba(76, 76, 76, 0.3137)', # set paper background color to black
+            font_color='white',)
+
+min_var = go.Figure(go.Indicator(
+    mode="number",
+    value=1.6,
+    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    title={"text": "Minimum Rate"}
+)).update_layout(
+            geo=dict(
+                bgcolor='rgba(76, 76, 76, 0.3137)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(76, 76, 76, 0.3137)'
+            ),
+            plot_bgcolor='rgba(76, 76, 76, 0.3137)', # set plot background color to black
+            paper_bgcolor='rgba(76, 76, 76, 0.3137)', # set paper background color to black
+            font_color='white',)
+
+avg_var = go.Figure(go.Indicator(
+    mode="number",
+    value=6.188351311336717,
+    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    title={"text": "Average Rate"}
+)).update_layout(
+            geo=dict(
+                bgcolor='rgba(76, 76, 76, 0.3137)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(76, 76, 76, 0.3137)'
+            ),
+            plot_bgcolor='rgba(76, 76, 76, 0.3137)', # set plot background color to black
+            paper_bgcolor='rgba(76, 76, 76, 0.3137)', # set paper background color to black
+            font_color='white',)
+max_var=go.Figure(go.Indicator(
+    mode="number",
+    value=9.5,
+    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    title={"text": "Maximum Rate",}
+)).update_layout(
+            geo=dict(
+                bgcolor='rgba(76, 76, 76, 0.3137)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(76, 76, 76, 0.3137)'
+            ),
+            plot_bgcolor='rgba(76, 76, 76, 0.3137)', # set plot background color to black
+            paper_bgcolor='rgba(76, 76, 76, 0.3137)', # set paper background color to black
+            font_color='white',)
+# Define the layout for the dashboard
+dashboard = html.Div(
+    children=[
+        html.H1("BAN Dashboard"),
+        html.Div(
+            children=[
+                dcc.Graph(id='ban1', figure=counter_var, style={'background-color': 'rgba(0,0,0,0.7)', 'width': '30%'}),
+                dcc.Graph(id='ban2', figure=min_var, style={'background-color': 'rgba(0,0,0,0.7)', 'width': '30%'}),
+                dcc.Graph(id='ban3', figure=avg_var, style={'background-color': 'rgba(0,0,0,0.7)', 'width': '30%'}),
+                dcc.Graph(id='ban3', figure=max_var, style={'background-color': 'rgba(0,0,0,0.7)', 'width': '30%'}),
+            ],
+            className="row",
+            style={"display": "flex", "justify-content": "space-between"}
+        )
     ],
-    className="g-0 ms-auto flex-nowrap mt-3 mt-md-0",
-    align="center",
+    style={"background-color": "black", "padding": "20px"}
 )
 
-navbar = dbc.Navbar(
-    dbc.Container(
-        [
-            html.A(
-                dbc.Row(
-                    [
-                        dbc.Col(html.Img(src=PLOTLY_LOGO, height="30px")),
-                        dbc.Col(dbc.NavbarBrand("Navbar", className="ms-2")),
-                    ],
-                    align="center",
-                    className="g-0",
-                ),
-                href="https://plotly.com",
-                style={"textDecoration": "none"},
-            ),
-            dbc.NavbarToggler(id="navbar-toggler", n_clicks=0),
-            dbc.Collapse(
-                search_bar,
-                id="navbar-collapse",
-                is_open=False,
-                navbar=True,
-            ),
-        ]
-    ),
-    color="dark",
-    dark=True,
-)
+# Create the Dash app
+app = dash.Dash(__name__)
+app.title = "BANDashboard"
 
-app = dash.Dash(__name__, external_stylesheets=[dbc.themes.BOOTSTRAP])
+# Define the app layout
+app.layout = html.Div(children=[dashboard])
 
-app.layout = dbc.Container(
-    [
-        navbar,
-        html.Br(),
-        html.H1("Test App"),
-        html.Div(id="output-div"),
-    ]
-)
-
-# add callback for toggling the collapse on small screens
-@app.callback(
-    Output("navbar-collapse", "is_open"),
-    [Input("navbar-toggler", "n_clicks")],
-    [State("navbar-collapse", "is_open")],
-)
-def toggle_navbar_collapse(n, is_open):
-    if n:
-        return not is_open
-    return is_open
-
-# callback to redirect user to Google with the input value
-@app.callback(
-    Output("output-div", "children"),
-    [Input("search-button", "n_clicks")],
-    [State("search-input", "value")],
-)
-def redirect_to_google(n_clicks, input_value):
-    imdb = IMDB()
-    if n_clicks > 0 and input_value:
-        string = imdb.search(input_value)
-        if string=='{\n  "result_count": 0,\n  "results": []\n}':
-            url='https://www.imdb.com/title/tt029046rr502/?ref_=fn_al_tt_1'
-        else:
-            res=json.loads(string)
-            url=res["results"][0]['url']
-        webbrowser.open(url, new=2)
-    return ""
-
-if __name__ == "__main__":
-    app.run_server(debug=True)
+# Run the app
+if __name__ == '__main__':
+    app.run_server(debug=True, port=8050)

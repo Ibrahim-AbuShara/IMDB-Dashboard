@@ -61,6 +61,83 @@ navbar = dbc.Navbar(
     dark=True,
 )
 
+counter_var = go.Figure(go.Indicator(
+    mode="number",
+    value=38338,
+    number={'valueformat': ',', 'font': {'size': 60}},
+    title={"text": "Total IMDB Content"}
+)).update_layout(
+            geo=dict(
+                bgcolor='rgba(76, 76, 76, 0)', # set background color to black
+                showland=False,
+                showocean=False,
+                oceancolor='rgba(76, 76, 76, 0)'
+            ),
+            plot_bgcolor='rgba(76, 76, 76, 0.0)', # set plot background color to black
+            paper_bgcolor='rgba(76, 76, 76, 0)', # set paper background color to black
+            font_color='white',)
+
+min_var = go.Figure(go.Indicator(
+    mode="number",
+    value=1.6,
+    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    title={"text": "Minimum Rate"}
+)).update_layout(
+            geo=dict(
+                bgcolor='rgba(76, 76, 76, 0)', # set background color to black
+                showland=False,
+                showocean=False,
+                oceancolor='rgba(76, 76, 76, 0)'
+            ),
+            plot_bgcolor='rgba(76, 76, 76, 0)', # set plot background color to black
+            paper_bgcolor='rgba(76, 76, 76, 0)', # set paper background color to black
+            font_color='white',)
+
+avg_var = go.Figure(go.Indicator(
+    mode="number",
+    value=6.188351311336717,
+    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    title={"text": "Average Rate"}
+)).update_layout(
+            geo=dict(
+                bgcolor='rgba(76, 76, 76, 0)', # set background color to black
+                showland=False,
+                showocean=False,
+                oceancolor='rgba(76, 76, 76, 0)'
+            ),
+            plot_bgcolor='rgba(76, 76, 76, 0)', # set plot background color to black
+            paper_bgcolor='rgba(76, 76, 76, 0)', # set paper background color to black
+            font_color='white',)
+max_var=go.Figure(go.Indicator(
+    mode="number",
+    value=9.5,
+    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    title={"text": "Maximum Rate",}
+)).update_layout(
+            geo=dict(
+                bgcolor='rgba(76, 76, 76, 0)', # set background color to black
+                showland=True,
+                showocean=True,
+                oceancolor='rgba(76, 76, 76, 0)'
+            ),
+            paper_bgcolor='rgba(76, 76, 76, 0)', # set paper background color to black
+            font_color='white',)
+# Define the layout for the dashboard
+bans = html.Div(
+    children=[
+        html.Div(
+            children=[
+                dcc.Graph(id='ban1', figure=counter_var, style={'width': '25%'}),
+                dcc.Graph(id='ban2', figure=min_var, style={ 'width': '25%'}),
+                dcc.Graph(id='ban3', figure=avg_var, style={ 'width': '25%'}),
+                dcc.Graph(id='ban4', figure=max_var, style={ 'width': '25%'}),
+            ],
+            className="row",
+           style={"display": "flex", "justify-content": "space-between", "height": "100px"}
+        )
+    ],
+    style={"background-color": 'rgba(0,0,0,0.7)', "padding": "20px"}
+)
 
 
 map_var = dbc.Col(
@@ -76,7 +153,7 @@ map_var = dbc.Col(
             paper_bgcolor='rgba(0,0,0,0.7)',  # set paper background color to black
             font_color='white'  # set font color to white
         ),
-        style={'width': '90%', 'height': '80vh', 'margin': 'auto'}  # center the graph and set width and height
+        style={'width': '90%', 'height': '70vh', 'margin': 'auto'}  # center the graph and set width and height
     ),
     width={'size': 10, 'offset': 1, 'order': 'first'}  # adjust width and offset to center the column
 )
@@ -457,6 +534,8 @@ app.layout = html.Div(
         html.Div(id="output-div"),
         dbc.Container(
             [
+                html.Br(),
+                html.Div(children=[bans]),
                 html.Br(),
                 map_header,
                 html.Br(),
