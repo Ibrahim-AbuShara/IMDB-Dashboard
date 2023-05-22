@@ -12,10 +12,12 @@ import webbrowser
 import json
 from fun import  *
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+app.title = "IMDb Dashboard"
+IMDB_LOGO = "https://ia.media-imdb.com/images/M/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE@._V1_.png"
+app.icon = IMDB_LOGO
+
 
 # Navbar
-IMDB_LOGO = "https://ia.media-imdb.com/images/M/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE@._V1_.png"
-
 search_bar = dbc.Row(
     [
         dbc.Col(dbc.Input(id="search-input", type="search", placeholder="Search")),
@@ -80,7 +82,7 @@ counter_var = go.Figure(go.Indicator(
 min_var = go.Figure(go.Indicator(
     mode="number",
     value=1.6,
-    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    number={'valueformat': ',.1f', 'font': {'size': 60}},
     title={"text": "Minimum Rate"}
 )).update_layout(
             geo=dict(
@@ -95,8 +97,8 @@ min_var = go.Figure(go.Indicator(
 
 avg_var = go.Figure(go.Indicator(
     mode="number",
-    value=6.188351311336717,
-    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    value=6.90351311336717,
+    number={'valueformat': ',.1f', 'font': {'size': 60}},
     title={"text": "Average Rate"}
 )).update_layout(
             geo=dict(
@@ -111,7 +113,7 @@ avg_var = go.Figure(go.Indicator(
 max_var=go.Figure(go.Indicator(
     mode="number",
     value=9.5,
-    number={'valueformat': ',.2f', 'font': {'size': 60}},
+    number={'valueformat': ',.1f', 'font': {'size': 60}},
     title={"text": "Maximum Rate",}
 )).update_layout(
             geo=dict(
@@ -410,6 +412,7 @@ button = dbc.DropdownMenu(
 # Update the layout
 rating_over_years_var = dbc.Col(
     [
+        button,
         dcc.Graph(
              id='rating_over_years-graph',
             figure=rating_over_years().update_layout(
@@ -424,14 +427,14 @@ rating_over_years_var = dbc.Col(
                 font_color='white',
             )
         ),
-        button
+        
     ],
     width=6
 )
 
 groth_var = dbc.Col(
     [
-        dcc.Graph(
+        html.Div([dcc.Graph(
             figure=groth().update_layout(
                 geo=dict(
                     bgcolor='rgba(0,0,0,0.01)',
@@ -443,13 +446,15 @@ groth_var = dbc.Col(
                 paper_bgcolor='rgba(0,0,0,0.7)',
                 font_color='white',
             )
-        )
+        )],
+    style={'margin-top': '30px'}
+                 )
     ],
-    width=6
+    width=6,    
 )
 
 map_header = html.H3(
-    "Exploring the Worldwide Distribution of Content:- ",
+    "Exploring the Worldwide Distribution of Content",
     className="header",
     style={
         "border": "2px solid #ffffff00",
@@ -464,7 +469,7 @@ map_header = html.H3(
     }
 )
 Rating_header = html.H3(
-    "Content Ratings Analysis :- ",
+    "Content Ratings Analysis",
     className="header",
     style={
         "border": "2px solid #ffffff00",
@@ -496,7 +501,7 @@ poularty_header = html.H3(
 )
 
 duration_header = html.H3(
-    "Content Duration Analysis :- ",
+    "Content Duration Analysis",
     className="header",
     style={
         "border": "2px solid #ffffff00",
@@ -512,7 +517,7 @@ duration_header = html.H3(
 )
 
 time_header = html.H3(
-    "Content Time Analysis :- ",
+    "Content Time Analysis",
     className="header",
     style={
         "border": "2px solid #ffffff00",
@@ -692,7 +697,6 @@ def update_roy(*args):
         typ=0
     else:
         selected_option = ctx.triggered[0]["prop_id"].split(".")[0][0]
-        print(selected_option)
         typ=int(selected_option)
    
     
@@ -804,6 +808,6 @@ def redirect_to_IMDB(n_clicks, input_value):
 
                           
 if __name__ == "__main__":
-    app.run_server(debug=True)
+    app.run_server(debug=False)
     
     
