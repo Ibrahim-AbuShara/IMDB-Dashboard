@@ -21,5 +21,8 @@ pip install plotly
 pip install pandas
 pip install PyMovieDb
 pip install webbrowser</code></pre>
+<h1>The output:</h1>
+	<img src="https://imgur.com/SR9t1Sr" alt="My Animation">
+	
 </body>
 </html>
