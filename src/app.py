@@ -12,6 +12,7 @@ import webbrowser
 import json
 from fun import  *
 app = dash.Dash(__name__, external_stylesheets=[dbc.themes.DARKLY])
+server = app.server
 app.title = "IMDb Dashboard"
 IMDB_LOGO = "https://ia.media-imdb.com/images/M/MV5BMTk3ODA4Mjc0NF5BMl5BcG5nXkFtZTgwNDc1MzQ2OTE@._V1_.png"
 app.icon = IMDB_LOGO
