@@ -24,7 +24,7 @@ pip install webbrowser</code></pre>
 <h1>The output:</h1>
 	 <li>Yoy can try it on:  https://imdb-dash-xcvy.onrender.com/</li>
 	
-	<img src="[https://imgur.com/SR9t1Sr](https://i.imgur.com/SR9t1Sr.gifv)" alt="My Animation">
+	<img src="https://i.imgur.com/SR9t1Sr.mp4" alt="My Animation">
 
 </body>
 </html>
