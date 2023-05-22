@@ -11,7 +11,6 @@
     <li>IMDB-Dashboard.py</li>
     <li>toolbox-fun.py</li>
     <li>imdb1.csv</li>
-    <li>yesterday</li>
     <li>test.py</li>
   </ul>
 
