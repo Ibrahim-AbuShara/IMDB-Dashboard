@@ -25,9 +25,7 @@ pip install webbrowser</code></pre>
 	<body>
 	 <li>Yoy can try it on:  https://imdb-dash-xcvy.onrender.com/</li>
 	
-	<video poster="//i.imgur.com/SR9t1Srh.jpg" preload="auto" autoplay="autoplay" muted="muted" loop="" webkit-playsinline="" style="width: 1280px; height: 720px;">
-                <source src="//i.imgur.com/SR9t1Sr.mp4" type="video/mp4">
-            </video>
+	<video controls="" autoplay="" name="media"><source src="https://i.imgur.com/SR9t1Sr.mp4" type="video/mp4"></video>
 
 </body>
 </html>
