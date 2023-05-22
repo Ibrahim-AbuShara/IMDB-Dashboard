@@ -1,7 +1,6 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>IMDb Dashboard</title>
 </head>
 <body>
   <h1>IMDb Dashboard</h1>
